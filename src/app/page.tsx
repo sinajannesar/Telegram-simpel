@@ -20,7 +20,7 @@ export default function Page() {
         </div>
 
         <div className="flex justify-center pt-4">
-          <Link href=""  className="px-8 py-3 font-semibold rounded-full shadow-lg hover:scale-105 focus:outline-none focus:ring-4 transition-all duration-300 ease-in-out transform bg-blue-600 text-white shadow-blue-500/50 hover:bg-blue-700 focus:ring-blue-300 dark:bg-blue-500 dark:shadow-blue-500/30 dark:hover:bg-blue-600 dark:focus:ring-blue-400/50">
+          <Link href="../authregister/login"  className="px-8 py-3 font-semibold rounded-full shadow-lg hover:scale-105 focus:outline-none focus:ring-4 transition-all duration-300 ease-in-out transform bg-blue-600 text-white shadow-blue-500/50 hover:bg-blue-700 focus:ring-blue-300 dark:bg-blue-500 dark:shadow-blue-500/30 dark:hover:bg-blue-600 dark:focus:ring-blue-400/50">
             Open Web Application
           </Link>
         </div>

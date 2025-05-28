@@ -1,6 +1,11 @@
-import { User } from '@/types/types';
 import fs from 'fs/promises';
 import path from 'path';
+
+// Ensure this file exports the User type
+export type User = {
+  id: string;
+  name: string;
+};
 
 interface UsersDB {
   users: User[];
@@ -13,8 +18,7 @@ export async function initUsersDb(): Promise<UsersDB> {
     await fs.access(DB_PATH);
     const data = await fs.readFile(DB_PATH, 'utf-8');
     return JSON.parse(data);
-  } catch (error:any) {
-    // If file doesn't exist, create it with empty users array
+  } catch {
     const initialData: UsersDB = { users: [] };
     await fs.mkdir(path.dirname(DB_PATH), { recursive: true });
     await fs.writeFile(DB_PATH, JSON.stringify(initialData, null, 2));

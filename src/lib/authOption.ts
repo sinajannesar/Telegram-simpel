@@ -1,33 +1,28 @@
-// lib/authOptions.ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { readUsersDb } from '@/lib/dbmaneger/usersDb';
-import { User } from "@/types/types";
+import { findUserByCredentials } from "@/lib/mocKData";
+import jwt from 'jsonwebtoken';
 
 interface AuthUser {
   id: string;
   name?: string | null;
   email?: string | null;
-  image?: string | null;
-  firstname?: string;
-  lastname?: string;
-  address?: string;
-  phonenumber?: string;
-  nashionalcode?: string;
-  createdAt?: string;
   role?: string;
   provider?: string;
+  token?: string; // اضافه کردن فیلد توکن
 }
 
 declare module "next-auth" {
   interface Session {
     user: AuthUser;
+    accessToken?: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     user?: AuthUser;
+    accessToken?: string;
   }
 }
 
@@ -45,29 +40,31 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const db = await readUsersDb();
-          const user = db.users.find(
-            (u: User) => u.email === credentials.email && u.password === credentials.password
-          );
+          const user = findUserByCredentials(credentials.email, credentials.password);
 
           if (!user) {
             return null;
           }
 
-          const stringId = user.id.toString();
-          
+          // تولید خودکار توکن
+          const token = jwt.sign(
+            {
+              userId: user.id,
+              email: user.email,
+              name: `${user.firstname} ${user.lastname}`,
+              role: 'user'
+            },
+            process.env.NEXTAUTH_SECRET!,
+            { expiresIn: '7d' }
+          );
+
           return {
-            id: stringId,
+            id: user.id.toString(),
             email: user.email,
             name: `${user.firstname} ${user.lastname}`,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            address: user.address,
-            phonenumber: user.phonenumber?.toString(),
-            nashionalcode: user.nashionalcode,
-            createdAt: user.createdAt,
             role: 'user',
-            provider: 'credentials'
+            provider: 'credentials',
+            token: token
           } as AuthUser;
         } catch (error) {
           console.error("Auth error:", error);
@@ -80,13 +77,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.user = user;
-        
+        token.accessToken = (user as AuthUser).token;
       }
       return token;
     },
     async session({ session, token }) {
       if (token.user) {
         session.user = token.user;
+        session.accessToken = token.accessToken;
       }
       return session;
     }
@@ -94,7 +92,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
     error: '/login'
-   
   },
   secret: process.env.NEXTAUTH_SECRET
 };

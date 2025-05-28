@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"; 
+import { Vazirmatn } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+const vazirmatn = Vazirmatn({ subsets: ['latin', 'arabic'] });
 
 export const metadata: Metadata = {
   title: "TELEGRAM ",
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={vazirmatn.className}>
         <ThemeProvider
           attribute="class" 
           defaultTheme="system" 
