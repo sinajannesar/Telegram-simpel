@@ -1,21 +1,22 @@
-import express, { Request, Response } from 'express';
-import { createServer, Server as HttpServer } from 'http';
+import express, { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import { createServer, Server as HttpServer,  } from 'http';
 import { Server as SocketIoServer, Socket } from 'socket.io';
-import next, {NextApiHandler } from 'next';
+import next from 'next';
+import { parse } from 'url';
 
 const port: number = parseInt(process.env.PORT || '3000', 10);
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const nextApp = next({ dev });
-const nextHandler: NextApiHandler = nextApp.getRequestHandler();
+const handle = nextApp.getRequestHandler();
 
 interface Message {
-  user: string; 
+  user: string;
   text: string;
   timestamp: number;
 }
 
 interface MessagesDB {
-  [key: string]: Message[]; 
+  [key: string]: Message[];
 }
 
 const messages: MessagesDB = {
@@ -28,18 +29,19 @@ nextApp.prepare().then(() => {
   const server: HttpServer = createServer(app);
   const io: SocketIoServer = new SocketIoServer(server);
 
-  // socket.io server
   io.on('connection', (socket: Socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('message.chat1', (data: Message) => {
+      if (!messages['chat1']) messages['chat1'] = [];
       messages['chat1'].push(data);
-      socket.broadcast.emit('message.chat1', data); 
+      socket.broadcast.emit('message.chat1', data);
     });
 
     socket.on('message.chat2', (data: Message) => {
+      if (!messages['chat2']) messages['chat2'] = [];
       messages['chat2'].push(data);
-      socket.broadcast.emit('message.chat2', data); 
+      socket.broadcast.emit('message.chat2', data);
     });
 
     socket.on('disconnect', () => {
@@ -47,7 +49,7 @@ nextApp.prepare().then(() => {
     });
   });
 
-  app.get('/messages/:chat', (req: Request, res: Response) => {
+  app.get('/messages/:chat', (req: ExpressRequest, res: ExpressResponse) => {
     const chatName: string = req.params.chat;
     if (messages[chatName]) {
       res.json(messages[chatName]);
@@ -56,12 +58,20 @@ nextApp.prepare().then(() => {
     }
   });
 
-  app.all('*', (req: Request, res: Response) => {
-    return nextHandler(req, res);
+  // Handle all other routes with Next.js
+  app.all('*', (req: ExpressRequest, res: ExpressResponse) => {
+    const parsedUrl = parse(req.url!, true);
+    return handle(req, res, parsedUrl);
   });
 
-  server.listen(port, (err?: any) => { // err can be undefined or an Error object
-    if (err) throw err;
+  server.listen(port, (err?: Error) => {
+    if (err) {
+      console.error('Server startup error:', err);
+      throw err;
+    }
     console.log(`> Ready on http://localhost:${port}`);
   });
+}).catch(ex => {
+  console.error('Failed to prepare Next.js app:', ex.stack);
+  process.exit(1);
 });
