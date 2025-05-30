@@ -30,12 +30,10 @@ export function LoginForm() {
       }
 
       const { token, user } = await res.json();
-      
-      // You can store the token in cookies or localStorage here
+
       console.log('Login successful!', { token, user });
 
-      // Redirect user to dashboard or homepage
-      router.push('/dashboard'); 
+      router.push('/dashboard');
 
     } catch {
       setError("An error occurred during login");
@@ -46,7 +44,6 @@ export function LoginForm() {
 
   return (
     <div className="relative max-w-md w-full mx-auto bg-gradient-to-br from-white/10 to-gray-900/10 dark:from-gray-900/90 dark:to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-white/30 dark:border-gray-700/50 transition-all duration-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]">
-      {/* Subtle animated background effect */}
       <div className="absolute inset-0 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 animate-pulse"></div>
       </div>
