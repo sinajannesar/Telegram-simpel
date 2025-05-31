@@ -28,12 +28,11 @@ export function LoginForm() {
         const data = await res.json();
         throw new Error(data.error || 'An error occurred');
       }
-
       const { token, user } = await res.json();
 
       console.log('Login successful!', { token, user });
 
-      router.push('/dashboard');
+      router.push('/chat/clone');
 
     } catch {
       setError("An error occurred during login");

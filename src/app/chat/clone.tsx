@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { GetServerSideProps, NextPage } from 'next'
-import fetch from 'isomorphic-unfetch'
 import useSocket from '@/hooks/useSocket'
 
 interface Message {

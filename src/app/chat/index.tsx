@@ -3,13 +3,11 @@ import Link from 'next/link';
 import { GetServerSideProps } from 'next';
 import useSocket from '@/hooks/useSocket';
 
-// Define the Message interface
 interface Message {
   id: number;
   value: string;
 }
 
-// Define props interface
 interface ChatOneProps {
   messages: Message[];
 }

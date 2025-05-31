@@ -1,0 +1,16 @@
+{
+    "ignore": [
+      ".next/**/*",
+      "node_modules/**/*",
+      "dist/**/*",
+      "*.log"
+    ],
+    "watch": [
+      "server.ts",
+      "pages/**/*",
+      "components/**/*",
+      "lib/**/*",
+      "styles/**/*"
+    ],
+    "ext": "ts,tsx,js,jsx,json"
+  }

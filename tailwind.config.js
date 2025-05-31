@@ -1,19 +1,17 @@
-import  plugin from'tailwindcss/plugin';
-/**
- @type {import('tailwindcss').Config} */
+import plugin from 'tailwindcss/plugin';
+/** @type {import('tailwindcss').Config} */
 
 module.exports = {
   darkMode: "class",
-
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
     extend: {},
   },
-  plugins: [plugin(function ({ addUtilities, theme }) {
+  plugins: [plugin(function ({ addUtilities }) {
     addUtilities({
       '.rotate-y-180': {
         transform: 'rotateY(180deg)',
@@ -28,6 +26,6 @@ module.exports = {
         perspective: '1000px',
       },
     });
-  }),],
+  })],
 }
 
