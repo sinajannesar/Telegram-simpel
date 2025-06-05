@@ -35,7 +35,7 @@ export function LoginForm() {
       console.log('Login successful!', { token, user });
 
       // Redirect user to dashboard or homepage
-      router.push('/dashboard'); 
+      router.push('/chat'); 
 
     } catch {
       setError("An error occurred during login");

@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+
 // Ensure this file exports the User type
 export type User = {
   id: string;

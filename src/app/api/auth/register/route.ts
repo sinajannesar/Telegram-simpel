@@ -10,16 +10,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'تمام فیلدها الزامی هستند' }, { status: 400 });
     }
 
-    // چک کردن وجود کاربر در mock data
     const existingUser = findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json({ error: 'کاربر با این ایمیل قبلاً ثبت نام کرده' }, { status: 409 });
     }
 
-    // ایجاد کاربر جدید در mock data
     const newUser = createUser({ email, password, firstname, lastname });
 
-    // تولید خودکار توکن
     const token = jwt.sign(
       {
         userId: newUser.id,
