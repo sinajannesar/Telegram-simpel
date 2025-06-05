@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react'; // Import signIn
 
 export function LoginForm() {
   const router = useRouter();
@@ -18,29 +19,42 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn('credentials', {
+        redirect: false, // To prevent automatic redirection by NextAuth and handle it manually
+        email: email,
+        password: password,
+        // callbackUrl: '/chat' // You can also specify the redirect path after success here
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'An error occurred');
+      setIsLoading(false); // Stop loading here as signIn has returned
+
+      if (result?.error) {
+        // result.error contains the message from the authorize function (if an Error was thrown)
+        // or default NextAuth messages like "CredentialsSignin"
+        if (result.error === "CredentialsSignin") {
+          setError("Incorrect email or password.");
+        } else {
+          setError(result.error);
+        }
+        return;
       }
 
-      const { token, user } = await res.json();
-      
-      // You can store the token in cookies or localStorage here
-      console.log('Login successful!', { token, user });
+      if (result?.ok && !result.error) {
+        console.log('Login successful via NextAuth!');
+        // After successful login, NextAuth sets the session cookie.
+        // Now useSession in the Chat component will show the correct state.
+        router.push('/chat'); // Redirect to the chat page
+        router.refresh(); // To ensure client layout and session are updated
+      } else {
+        // If result.ok is false but there's no specific error (unlikely for credentials)
+        setError("An error occurred during login. Please try again.");
+      }
 
-      // Redirect user to dashboard or homepage
-      router.push('/chat'); 
-
-    } catch {
-      setError("An error occurred during login");
-    } finally {
+    } catch (err) {
+      // This catch is usually for unexpected or network errors
       setIsLoading(false);
+      console.error("Unexpected login error:", err);
+      setError("An unexpected error occurred during login.");
     }
   };
 
@@ -106,7 +120,7 @@ export function LoginForm() {
       <p className="text-center text-sm text-gray-500 dark:text-gray-300 mt-8 relative z-10">
         Don&apos;t have an account?{' '}
         <Link
-          href="/authregister/register"
+          href="/authregister/register" // Enter your registration page path
           className="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 hover:underline"
         >
           Register Now
