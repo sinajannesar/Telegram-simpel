@@ -46,13 +46,12 @@ export function LoginForm() {
 
   return (
     <div className="relative max-w-md w-full mx-auto bg-gradient-to-br from-white/10 to-gray-900/10 dark:from-gray-900/90 dark:to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-white/30 dark:border-gray-700/50 transition-all duration-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]">
-      {/* Subtle animated background effect */}
       <div className="absolute inset-0 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/0 animate-pulse"></div>
       </div>
 
       <div className="text-center mb-10 relative z-10">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-950 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           Welcome Back
         </h1>
         <p className="text-gray-500 dark:text-gray-300 mt-3 text-lg">
@@ -93,7 +92,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full px-8 py-3 font-semibold rounded-xl shadow-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center relative overflow-hidden group"
+          className="w-full px-8 py-3 font-semibold rounded-xl shadow-lg bg-gradient-to-r from-blue-800 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center relative overflow-hidden group"
         >
           <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
           {isLoading ? (

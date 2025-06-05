@@ -12,18 +12,23 @@ export function ThemeSwitcher() {
     setMounted(true);
   }, []);
 
- 
   if (!mounted) {
     return null;
   }
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-      aria-label="Toggle theme" 
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+      aria-label="Toggle theme"
     >
-      {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+      {mounted && (
+        theme === "light" ? (
+          <Moon className="h-5 w-5 transition-transform duration-200" />
+        ) : (
+          <Sun className="h-5 w-5 transition-transform duration-200" />
+        )
+      )}
     </button>
   );
 }
