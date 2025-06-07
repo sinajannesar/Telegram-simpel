@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev-server": "ts-node src/server.ts"
+    "socket-server": "tsx server.ts",
+    "dev-with-socket": "concurrently \"npm run dev\" \"npm run socket-server\""
   },
+  
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.15.0",
@@ -34,8 +36,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "nodemon": "^3.1.10",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }
