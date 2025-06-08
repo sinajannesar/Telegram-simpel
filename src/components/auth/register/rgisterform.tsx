@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Loader2, Hash } from 'lucide-react';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export function RegisterForm() {
     lastname: '',
     email: '',
     password: '',
+    roomId: '', 
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,10 @@ export function RegisterForm() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          roomId: formData.roomId || `room_${Date.now()}` // اگر roomId خالی باشد، یکی تولید کن
+        }),
       });
 
       if (!res.ok) {
@@ -39,6 +43,15 @@ export function RegisterForm() {
 
       const { token, user } = await res.json();
       console.log('Registration successful!', { token, user });
+
+      // ذخیره اطلاعات کاربر در localStorage برای استفاده در chat
+      localStorage.setItem('user', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        roomId: user.roomId
+      }));
 
       router.push('/chat');
 
@@ -72,6 +85,7 @@ export function RegisterForm() {
               type="text"
               name="firstname"
               placeholder="First Name"
+              value={formData.firstname}
               onChange={handleChange}
               required
               className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50"
@@ -83,33 +97,53 @@ export function RegisterForm() {
               type="text"
               name="lastname"
               placeholder="Last Name"
+              value={formData.lastname}
               onChange={handleChange}
               required
               className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50"
             />
           </div>
         </div>
+        
         <div className="relative group">
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
           <input
             type="email"
             name="email"
             placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
             required
             className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50"
           />
         </div>
+
         <div className="relative group">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
           <input
             type="password"
             name="password"
             placeholder="Password"
+            value={formData.password}
             onChange={handleChange}
             required
             className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50"
           />
+        </div>
+
+        <div className="relative group">
+          <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
+          <input
+            type="text"
+            name="roomId"
+            placeholder="Room ID (optional)"
+            value={formData.roomId}
+            onChange={handleChange}
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50"
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Leave empty to auto-generate a room ID
+          </p>
         </div>
 
         {error && (

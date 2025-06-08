@@ -4,7 +4,7 @@ export interface User {
   password: string;
   firstname: string;
   lastname: string;
-  roomId?: string | number; // اضافه کردن roomId برای ذخیره اتاق آخر کاربر
+  roomId?: string | number;  
   createdAt: string;
 }
 
@@ -14,18 +14,18 @@ export const mockUsers: User[] = [
     id: 1,
     email: "sinajannesar99@gmail.com",
     password: "123456",
-    firstname: "احمد",
-    lastname: "احمدی",
-    roomId: "room_1", // اتاق پیش‌فرض
+    firstname: "sina",
+    lastname: "jnnr",
+    roomId: "room_1", 
     createdAt: "2024-01-01T00:00:00.000Z"
   },
   {
     id: 2,
     email: "user2@example.com", 
     password: "123456",
-    firstname: "سارا",
-    lastname: "محمدی",
-    roomId: "room_2", // اتاق پیش‌فرض
+    firstname: "reza",
+    lastname: "mohamad",
+    roomId: "room_1", 
     createdAt: "2024-01-02T00:00:00.000Z"
   }
 ];
@@ -42,7 +42,7 @@ export const createUser = (userData: Omit<User, 'id' | 'createdAt'>): User => {
   const newUser: User = {
     ...userData,
     id: Date.now(),
-    roomId: `room_${Date.now()}`, // تولید roomId منحصر به فرد برای کاربر جدید
+    roomId: `room_${Date.now()}`, 
     createdAt: new Date().toISOString()
   };
   mockUsers.push(newUser);

@@ -1,126 +1,145 @@
-// app.tsx یا کامپوننت والد شما
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { useRouter } from "next/navigation";
 import ChatPage from "@/components/page";
 
+// --- Custom SVG Animation Component: Glowing Aurora ---
+// یک گوی درخشان و متحرک که حس یک شفق قطبی را القا می‌کند
+const GlowingAurora = () => (
+  <div className="relative flex h-40 w-40 items-center justify-center">
+    {/* لایه زیرین برای ایجاد درخشش بیشتر */}
+    <div
+      className="absolute h-full w-full rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 opacity-75 animate-aurora-pulse"
+      style={{ animationDelay: '2s' }}
+    />
+    {/* لایه اصلی درخشان */}
+    <div className="absolute h-3/4 w-3/4 rounded-full bg-gradient-to-r from-sky-400 to-cyan-300 opacity-80 animate-aurora-pulse" />
+  </div>
+);
+
+
+// --- Reusable Ultimate Loading Screen Component ---
+interface LoadingScreenProps {
+  title: string;
+  message: string;
+}
+
+const UltimateLoadingScreen: React.FC<LoadingScreenProps> = ({ title, message }) => (
+  <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-900 text-white overflow-hidden">
+    {/* پس‌زمینه گرادینت متحرک */}
+    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/80 to-blue-900 bg-[size:200%_200%] animate-gradient-flow" />
+    
+    <div className="relative z-10 flex flex-col items-center space-y-8 text-center p-4">
+      <GlowingAurora />
+      <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white" style={{ textShadow: '0 0 15px rgba(255,255,255,0.3)' }}>
+          {title}
+        </h1>
+        <p className="mt-4 text-lg text-gray-300/80 tracking-wider">
+          {message}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+
+// --- Main App Component ---
+
+interface UserData {
+  id: number;
+  email: string;
+  firstname: string;
+  lastname: string;
+  roomId: string | number;
+}
+
 const App = () => {
+  const router = useRouter();
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [username, setUsername] = useState<string>("");
-  const [roomId, setRoomId] = useState<string>("");
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  // استفاده از useRef برای جلوگیری از re-creation
   const socketRef = useRef<Socket | null>(null);
 
-  // تنها یکبار socket بسازید
+  // Check for user data and retrieve it (Logic remains unchanged)
   useEffect(() => {
-    // اگر socket قبلاً ساخته شده، دوباره نسازید
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser: UserData = JSON.parse(storedUser);
+        if (parsedUser.id && parsedUser.email && parsedUser.firstname && parsedUser.lastname) {
+          if (!parsedUser.roomId) {
+            parsedUser.roomId = `room_${parsedUser.id}`;
+            localStorage.setItem('user', JSON.stringify(parsedUser));
+          }
+          setUserData(parsedUser);
+          // Simulate a small delay to appreciate the animation :)
+          setTimeout(() => setIsLoading(false), 500); 
+        } else {
+          router.push('/authregister/login');
+        }
+      } catch  {
+        localStorage.removeItem('user');
+        router.push('/authregister/login');
+      }
+    } else {
+      setIsLoading(false);
+      router.push('/authregister/login');
+    }
+  }, [router]);
+
+  // Create socket only once (Logic remains unchanged)
+  useEffect(() => {
     if (socketRef.current) return;
-
-    const newSocket = io("http://localhost:3001", {
-      transports: ["websocket"], // فقط websocket استفاده کنید
-    });
-
-    newSocket.on("connect", () => {
-      console.log("Connected to server");
-      setIsConnected(true);
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Disconnected from server");
-      setIsConnected(false);
-    });
-
+    const newSocket = io("http://localhost:3001", { transports: ["websocket"] });
+    newSocket.on("connect", () => setIsConnected(true));
+    newSocket.on("disconnect", () => setIsConnected(false));
     socketRef.current = newSocket;
     setSocket(newSocket);
-
-    // Cleanup function
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
       }
     };
-  }, []); // خالی بگذارید - فقط یکبار اجرا شود
+  }, []);
 
-  // Join room function
-  const joinRoom = (username: string, roomId: string) => {
-    if (socketRef.current && username && roomId) {
-      setUsername(username);
-      setRoomId(roomId);
-      socketRef.current.emit("join_room", roomId);
-    }
-  };
+  // Loading state for user data
+  if (isLoading) {
+    return (
+      <UltimateLoadingScreen 
+        title="Preparing Your Space"
+        message="Crafting your personal environment..."
+      />
+    );
+  }
 
+  // Connection loading state
   if (!socket || !isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4">Connecting to server...</p>
-        </div>
-      </div>
+        <UltimateLoadingScreen 
+            title="Waking Up The Servers"
+            message="Connecting to the global network..."
+        />
     );
   }
 
-  if (!username || !roomId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-6 text-center">Join Chat</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const user = formData.get("username") as string;
-              const room = formData.get("roomId") as string;
-              if (user && room) {
-                joinRoom(user, room);
-              }
-            }}
-            className="space-y-4"
-          >
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
-              <input
-                name="username"
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your username"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Room ID
-              </label>
-              <input
-                name="roomId"
-                type="text" 
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter room ID"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Join Chat
-            </button>
-          </form>
-        </div>
-      </div>
-    );
+  // If user data is still null after loading, redirect
+  if (!userData) {
+    router.push('/authregister/login');
+    return null; 
   }
+
+  const displayName = `${userData.firstname} ${userData.lastname}`;
+  const roomId = userData.roomId?.toString() || `room_${userData.id}`;
 
   return (
     <ChatPage 
       socket={socket} 
-      username={username} 
+      username={displayName} 
       roomId={roomId} 
     />
   );

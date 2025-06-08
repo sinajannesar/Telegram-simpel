@@ -4,7 +4,29 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Loader2 } from 'lucide-react';
-import { signIn } from 'next-auth/react'; // Import signIn
+import { signIn } from 'next-auth/react';
+
+// Mock users data - برای استفاده موقت
+const mockUsers = [
+  {
+    id: 1,
+    email: "sinajannesar99@gmail.com",
+    password: "123456",
+    firstname: "sina",
+    lastname: "jnnr",
+    roomId: "room_1",
+    createdAt: "2024-01-01T00:00:00.000Z"
+  },
+  {
+    id: 2,
+    email: "user2@example.com",
+    password: "123456",
+    firstname: "reza",
+    lastname: "mohamad",
+    roomId: "room_1",
+    createdAt: "2024-01-02T00:00:00.000Z"
+  }
+];
 
 export function LoginForm() {
   const router = useRouter();
@@ -20,17 +42,14 @@ export function LoginForm() {
 
     try {
       const result = await signIn('credentials', {
-        redirect: false, // To prevent automatic redirection by NextAuth and handle it manually
+        redirect: false,
         email: email,
         password: password,
-        // callbackUrl: '/chat' // You can also specify the redirect path after success here
       });
 
-      setIsLoading(false); // Stop loading here as signIn has returned
+      setIsLoading(false);
 
       if (result?.error) {
-        // result.error contains the message from the authorize function (if an Error was thrown)
-        // or default NextAuth messages like "CredentialsSignin"
         if (result.error === "CredentialsSignin") {
           setError("Incorrect email or password.");
         } else {
@@ -41,17 +60,47 @@ export function LoginForm() {
 
       if (result?.ok && !result.error) {
         console.log('Login successful via NextAuth!');
-        // After successful login, NextAuth sets the session cookie.
-        // Now useSession in the Chat component will show the correct state.
-        router.push('/chat'); // Redirect to the chat page
-        router.refresh(); // To ensure client layout and session are updated
+        
+        // استفاده از mock data برای دریافت اطلاعات کاربر
+        try {
+          // پیدا کردن کاربر از mock data
+          const userData = mockUsers.find(user => user.email === email);
+          
+          if (userData) {
+            // ذخیره اطلاعات کاربر در localStorage
+            localStorage.setItem('user', JSON.stringify({
+              id: userData.id,
+              email: userData.email,
+              firstname: userData.firstname,
+              lastname: userData.lastname,
+              roomId: userData.roomId || `room_${userData.id}`
+            }));
+
+            console.log('User data saved to localStorage:', {
+              id: userData.id,
+              email: userData.email,
+              firstname: userData.firstname,
+              lastname: userData.lastname,
+              roomId: userData.roomId || `room_${userData.id}`
+            });
+          } else {
+            console.error('User not found in mock data');
+            setError("User data not found.");
+            return;
+          }
+        } catch (err) {
+          console.error('Error processing user data:', err);
+          setError("Error processing user data.");
+          return;
+        }
+
+        router.push('/chat');
+        router.refresh();
       } else {
-        // If result.ok is false but there's no specific error (unlikely for credentials)
         setError("An error occurred during login. Please try again.");
       }
 
     } catch (err) {
-      // This catch is usually for unexpected or network errors
       setIsLoading(false);
       console.error("Unexpected login error:", err);
       setError("An unexpected error occurred during login.");
@@ -120,7 +169,7 @@ export function LoginForm() {
       <p className="text-center text-sm text-gray-500 dark:text-gray-300 mt-8 relative z-10">
         Don&apos;t have an account?{' '}
         <Link
-          href="/authregister/register" // Enter your registration page path
+          href="/authregister/register"
           className="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 hover:underline"
         >
           Register Now
