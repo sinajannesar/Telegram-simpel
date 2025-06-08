@@ -7,10 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "socket-server": "tsx server.ts",
-    "dev-with-socket": "concurrently \"npm run dev\" \"npm run socket-server\""
+    "node": "tsx server.ts"
   },
-  
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.15.0",
