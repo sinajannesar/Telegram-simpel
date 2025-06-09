@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
-// Mock users data - برای استفاده موقت
 const mockUsers = [
   {
     id: 1,
@@ -61,13 +60,10 @@ export function LoginForm() {
       if (result?.ok && !result.error) {
         console.log('Login successful via NextAuth!');
         
-        // استفاده از mock data برای دریافت اطلاعات کاربر
         try {
-          // پیدا کردن کاربر از mock data
           const userData = mockUsers.find(user => user.email === email);
           
           if (userData) {
-            // ذخیره اطلاعات کاربر در localStorage
             localStorage.setItem('user', JSON.stringify({
               id: userData.id,
               email: userData.email,

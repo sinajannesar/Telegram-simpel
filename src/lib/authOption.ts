@@ -1,4 +1,3 @@
-// src/lib/authOptions.ts - Improved NextAuth configuration
 import type { NextAuthOptions, Session, User as NextAuthUser } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -69,31 +68,26 @@ export const authOptions: NextAuthOptions = {
         token.name = u.name ?? undefined;
         token.role = u.role;
         
-        // Generate JWT token for Socket.IO authentication
         const jwtSecret = process.env.NEXTAUTH_SECRET;
         if (jwtSecret) {
           try {
-            // Create a more comprehensive JWT payload
             const jwtPayload = {
-              // Standard JWT claims
-              sub: u.id, // Subject (user ID)
-              iat: Math.floor(Date.now() / 1000), // Issued at
-              exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // Expires in 24 hours
-              iss: 'your-app-name', // Issuer
-              aud: 'socket-io', // Audience
+              sub: u.id, 
+              iat: Math.floor(Date.now() / 1000), 
+              exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), 
+              iss: 'telegram-simpel', 
+              aud: 'socket-io', 
               
-              // Custom claims
               userId: u.id,
               name: u.name,
               email: u.email,
               role: u.role,
               
-              // Add session identifier
               sessionId: `session_${u.id}_${Date.now()}`
             };
 
             token.accessToken = jwt.sign(jwtPayload, jwtSecret, {
-              algorithm: 'HS256' // Ensure consistent algorithm
+              algorithm: 'HS256' 
             });
             
             console.log('🔐 Generated JWT for user:', u.id);
@@ -105,13 +99,11 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
-      // Refresh token if it's close to expiration (optional)
       if (token.accessToken) {
         try {
           const decoded = jwt.decode(token.accessToken) as { exp?: number } | null;
           if (decoded && decoded.exp) {
             const timeUntilExpiry = decoded.exp - Math.floor(Date.now() / 1000);
-            // Refresh if less than 1 hour remaining
             if (timeUntilExpiry < 3600 && process.env.NEXTAUTH_SECRET) {
               const jwtPayload = {
                 sub: token.userId,
@@ -165,5 +157,5 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development', // Enable debug in development
+  debug: process.env.NODE_ENV === 'development', 
 };

@@ -5,21 +5,19 @@ import { useRouter } from "next/navigation";
 
 // --- آیکون‌های SVG ---
 const SendIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
 );
 const LogoutIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
 );
 const JoinIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 );
 
-// --- اینترفیس‌ها ---
 interface IMsgData { roomId: string | number; user: string; msg: string; time: string; }
 interface UserData { id: number; email: string; firstname: string; lastname: string; roomId: string | number; }
 interface ChatPageProps { socket: Socket; username: string; roomId: string; }
 
-// --- کامپوننت پیام بازطراحی شده ---
 const Message = React.memo(({ user, msg, isCurrentUser }: { user: string; msg: string; isCurrentUser: boolean; }) => (
   <div className={`flex items-start gap-3 mb-5 animate-message-in ${isCurrentUser ? "justify-end" : "justify-start"}`}>
     <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm shadow-md ${isCurrentUser ? "bg-gradient-to-br from-sky-500 to-blue-600 text-white" : "bg-gray-700 text-gray-200"} ${isCurrentUser ? "order-2" : "order-1"}`}>
@@ -33,7 +31,6 @@ const Message = React.memo(({ user, msg, isCurrentUser }: { user: string; msg: s
 ));
 Message.displayName = 'Message';
 
-// --- کامپوننت اصلی صفحه چت ---
 const ChatPage = ({ socket, roomId }: ChatPageProps) => {
   const router = useRouter();
   const [currentMsg, setCurrentMsg] = useState<string>("");
@@ -53,8 +50,7 @@ const ChatPage = ({ socket, roomId }: ChatPageProps) => {
   const handleLogout = useCallback(() => { localStorage.removeItem('user'); socket.disconnect(); router.push('/authregister/login'); }, [router, socket]);
 
   if (!userData) {
-      // استفاده از صفحه لودینگ برای سازگاری
-      return <div className="h-screen w-full flex items-center justify-center bg-gray-900"><p className="text-white">Loading User Data...</p></div>;
+    return <div className="h-screen w-full flex items-center justify-center bg-gray-900"><p className="text-white">Loading User Data...</p></div>;
   }
 
   const displayName = `${userData.firstname} ${userData.lastname}`;

@@ -32,7 +32,7 @@ export function RegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          roomId: formData.roomId || `room_${Date.now()}` // اگر roomId خالی باشد، یکی تولید کن
+          roomId: formData.roomId || `room_${Date.now()}` 
         }),
       });
 
@@ -44,7 +44,6 @@ export function RegisterForm() {
       const { token, user } = await res.json();
       console.log('Registration successful!', { token, user });
 
-      // ذخیره اطلاعات کاربر در localStorage برای استفاده در chat
       localStorage.setItem('user', JSON.stringify({
         id: user.id,
         email: user.email,
