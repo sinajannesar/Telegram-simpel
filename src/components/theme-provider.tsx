@@ -3,12 +3,13 @@
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import type { ComponentProps } from "react";
 
-import { type ThemeProviderProps as NextThemeProviderProps } from "next-themes";
+type ProviderProps = ComponentProps<typeof NextThemesProvider>;
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  attribute?: NextThemeProviderProps["attribute"];
+  attribute?: ProviderProps["attribute"];
   defaultTheme?: string;
   enableSystem?: boolean;
   disableTransitionOnChange?: boolean;
